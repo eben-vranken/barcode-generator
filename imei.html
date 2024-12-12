@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMEI Barcode Label Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .labels {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .label {
+            display: inline-block;
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        @media print {
+
+            textarea,
+            button,
+            h1 {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .labels {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>IMEI Barcode Label Generator</h1>
+    <textarea id="imeiInput" placeholder="Enter IMEI codes, one per line..."></textarea>
+    <br>
+    <button onclick="generateLabels()">Generate Labels</button>
+    <button onclick="window.print()">Print Labels</button>
+
+    <div class="labels" id="labelsContainer"></div>
+
+    <script>
+        function generateLabels() {
+            const imeiInput = document.getElementById('imeiInput').value;
+            const labelsContainer = document.getElementById('labelsContainer');
+
+            labelsContainer.innerHTML = '';
+
+            const imeiList = imeiInput.split('\n').map(line => line.trim()).filter(line => line);
+
+            imeiList.forEach(imei => {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'label';
+
+                // Create barcode SVG
+                const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                JsBarcode(barcodeSvg, imei, {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 2,
+                    height: 50,
+                    displayValue: false
+                });
+
+                const imeiText = document.createElement('p');
+                imeiText.textContent = imei;
+
+                labelDiv.appendChild(barcodeSvg);
+                labelDiv.appendChild(imeiText);
+                labelsContainer.appendChild(labelDiv);
+            });
+        }
+    </script>
+</body>
+
+</html>
